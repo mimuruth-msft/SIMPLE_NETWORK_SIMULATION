@@ -4,7 +4,7 @@ Grading:
 
 0 - 35 pts depending on effort, if nothing works :) Note that this is a subjective measure, so don't argue with the TA about it.
 
-Otherwise, 35 + how many points you get by *successfully* running each of the following scenarios
+Otherwiser, 35 + how many points you get by *successfully* running each of the following scenarios
 
 Scenario 1 (35 pts)
 ===================
