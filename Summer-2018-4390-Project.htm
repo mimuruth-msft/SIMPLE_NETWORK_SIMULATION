@@ -1,0 +1,621 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- saved from url=(0149)https://elearning.utdallas.edu/bbcswebdav/pid-2002523-dt-content-rid-48939522_1/courses/2185-merged-CE43900U2-CS43900U2/Summer-2018-4390-Project.html -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	
+	<title></title>
+	<meta name="generator" content="LibreOffice 5.1.6.2 (Linux)">
+	<meta name="author" content="J Cobb">
+	<meta name="created" content="00:00:00">
+	<meta name="changed" content="2018-07-12T16:54:25.643817092">
+	<meta name="created" content="00:00:00">
+	<meta name="changed" content="2018-07-12T16:51:39.896075199">
+	<style type="text/css">
+		p { color: #000000 }
+		h2 { color: #000000 }
+		h2.cjk { font-family: "Times" }
+		h2.ctl { font-family: "Times" }
+		h3 { color: #000000 }
+		h3.cjk { font-family: "Times" }
+		h3.ctl { font-family: "Times" }
+		a:link { color: #000099 }
+		a:visited { color: #990099 }
+	</style>
+<link rel="stylesheet" href="chrome-extension://mooikfkahbdckldjjndioackbalphokd/assets/prompt.css"><script src="chrome-extension://mooikfkahbdckldjjndioackbalphokd/assets/prompt.js"></script></head>
+<body lang="en-US" text="#000000" link="#000099" vlink="#990099" bgcolor="#ffffff" dir="ltr">
+<p><b>CS 4390 Summer 2018 Programming Project<br>
+<br>
+NOTE: your
+project MUST run on one of the Unix machines on campus, NOT ON YOUR
+PC. I recommend cs1.utdallas.edu (and cs2). University-wide machines
+like giant will likely complain about resource usage!<br>
+<br>
+You
+can use any language that you want, as long as it runs on the unix
+machines on campus.<br>
+<br>
+I highly recommend that you DO NOT use
+threads! In the past, students unknowingly have created around 200
+threads which of course causes the system to kill your programs.<br>
+<br>
+You
+will submit your source code and any instructions on how to compile
+it (i.e. which machine you compiled it on and using what command) You
+have to submit a README file, along with your source code,
+indicating: on which machine you run it, *exactly* what command you
+used to compile it.<br>
+<br>
+Please make sure your program uses the
+arguments as described below and in the order described. Otherwise,
+the TA may have to modify the shell scripts to run our tests, which
+we will not be happy about (hence, possible point deduction). <br>
+<br>
+We
+will run your code in the UTD unix machine that you mention in the
+README file, and see if it works.<br>
+<br>
+This is a long
+description, so it can have many omissions, typos, and mistakes. The
+sooner you read it and find them, the sooner I will be able to fix
+them :)</b></p>
+<h2>Overview</h2>
+<h3>Processes, files, and arguments</h3>
+<p>We will simulate a very simple network by having a process
+correspond to a node in the network, and files correspond to channels
+in the network.</p>
+<p>We will have at most 10 nodes in the network, nodes 0 , 1, 2, . .
+. , 9, or LESS, not all nodes need to be present.</p>
+<p>Each process (i.e. node) is going to be given the following
+arguments</p>
+<ol>
+	<li>
+<p style="margin-bottom: 0in">id of this node (i.e., a number
+	from 0 to 9) 
+	</p>
+	</li><li>
+<p style="margin-bottom: 0in">the duration, in seconds, that
+	the node should run before it terminates</p>
+	</li><li>
+<p style="margin-bottom: 0in">the destination id of a process
+	to which the transport protocol should send data 
+	</p>
+	</li><li>
+<p style="margin-bottom: 0in">a string of arbitrary text which
+	the transport layer will send to the destination 
+	</p>
+	</li><li>
+<p style="margin-bottom: 0in">the starting time for the
+	transport layer (explained much later below)</p>
+	</li><li>
+<p>a list of id's of neighbors of the process 
+	</p>
+</li></ol>
+<p>We will have a <b>single program</b> node.c (or node.java, or
+node.cc whatever) which has the code for a node. Since we have
+multiple nodes, we will run the same program multiple times, in
+<b>parallel</b>. The only difference between each of the copies of
+the program running in parallel are the arguments to the program.</p>
+<p>For example, assume I have two programs, A and B, and I want to
+run them at the same time. At the Unix prompt &gt;, I would type the
+following</p>
+<p>&gt; A &amp;</p>
+<p>&gt; B &amp;</p>
+<p>By typing the &amp; we are putting the program in the
+"background", i.e., the program runs in the background and
+you can keep typing things at the terminal. Therefore, A and B are
+running in parallel at the same time.</p>
+<p>Again, let node be your program that represents a node. The
+arguments of the program are as follows</p>
+<p>node 3 100 5 "this is a message"&nbsp; 40 2 1</p>
+<p>The following would execute the program node, and the first
+argument is the id of the node (3), the second is the number of
+seconds the process will run (100), followed by the destination for
+this node (5), then the message string "this is a message",
+then the time at which the transport layer begins, and the last
+arguments is a list of neighbors (i.e. 2 and 1 are neighbors of 3)</p>
+<p>For example, assume I have a network with three nodes, 0 , 1, 2,
+and I want node 0 to send a string "this is a message from 0"
+to node 2, and node 1 to send a message "this is a message from
+1" to node 2. Also, assume 0 and 1 are neighbors, and 1 and 2
+are neighbors. Then I would execute the following commands at the
+Unix prompt &gt; (your prompt may, of course, be different)</p>
+<p>&gt; node 0 100 2 "this is a message from 0" 30 1 &amp;</p>
+<p>&gt; node 1 100 2 "this is a message from 1" 30 0 2 &amp;</p>
+<p>&gt; node 2 100 2 1 &amp;</p>
+<p>This will run three copies of node in the background, the only
+difference between them are the arguments each one has.</p>
+<p>For node 2, since the "destination" is 2 itself, this
+means 2 should not send a transport level message to anyone, and the
+list of neighbors is just node 1. Note that it does not have a start
+time for the trasnport layer</p>
+<p>Note that each node can be the source of a string or not be a
+source at all. However, each node may receive strings from many other
+nodes. You cannot know from whom in advance.</p>
+<p><b>The channels will be modeled via TEXT files (when we grade, we
+should be able to read them via a </b><u><b>typical text editor</b></u><b>,
+the files should contain only normal characters, i.e., digits,
+letters, spaces, etc.).</b> File name "from0to1.txt"
+corresponds to the channel from node 0 to node 1. Therefore, node 0
+opens this file for writing (actually, <b>appending</b>, you don't
+overwrite any previous contents) and node 1 opens this file for
+reading. File name "from1to0.txt" corresponds to the
+channel from node 1 to node 0, and process 1 opens this file for
+writing (appending) and process 0 opens this file for reading.</p>
+<p>Note that at the end of the execution, when all nodes have
+finished, the file "from1to0.txt" will contain all the
+messages that were sent from node 1 to node 0 during the execution.
+I.e., messages are <b>appended</b> to this file, <i>they are never
+deleted</i>. We will look at your channel files at the end of the
+execution to check that all the messages were sent correctly.</p>
+<p>Program node (which represents a node) will contain a transport
+layer, a network layer, and a data link layer, which we overview
+next.</p>
+<h3 class="western">Overview of each layer</h3>
+<p>The data link layer will read bytes from each of the input files.
+The input files are just a sequence of bytes. The datalink layer has
+to separate the bytes into messages. Each message is then given to
+the network layer. 
+</p>
+<p>The network layer will determine if this node is the destination
+of the message. If it is, it gives the message to the transport
+layer. If it is not, it gives the message to the link layer to be
+forwarded to the channel towards the destination (the destination may
+be multiple hops away)</p>
+<p>The network layer will also perform routing.</p>
+<p>The transport layer will do the following:</p>
+<ol type="a">
+	<li>
+<p style="margin-bottom: 0in">Send the string given in the
+	argument to the appropriate destination (by breaking it up and
+	giving it to the network layer) 
+	</p>
+	</li><li>
+<p style="margin-bottom: 0in">Receive messages from the
+	network layer: only those messages that are, of course, addressed to
+	this node 
+	</p>
+	</li><li>
+<p>Output to a file called "nodeXreceived" where X
+	is the node id (0 .. 9) all the stings that you received. The
+	contents of this file should look like this for node 2 in the
+	example above: 
+	</p>
+</li></ol>
+<p style="margin-left: 0.83in">From 0 received: this is a message
+from 0</p>
+<p>The datalink layer will do the following:</p>
+<ol>
+	<li>
+<p style="margin-bottom: 0in">Since the channel is a file, you
+	can read one byte at a time form the file, however, you need to
+	determine when the frame (message )&nbsp;begins and when it ends.
+	So, we will use fixed-sized frames with a start of message sequence
+	and a checksum to check for correctness.</p>
+	</li><li>
+<p style="margin-bottom: 0in">When a whole message is
+	received, give it to the network layer. 
+	</p>
+	</li><li>
+<p>Receive messages from the network layer, encapsulate them
+	into data link layer messages, and append them to the appropriate
+	text file. 
+	</p>
+</li></ol>
+<h2>Detail of Each Layer</h2>
+<h3>Datalink layer</h3>
+<p>
+Since
+the channel is a file, you can read one byte at a time form the file,
+however, you need to determine when the frame (message )&nbsp;begins
+and when it ends.</p>
+<p>Each
+message will begin with the bytes "XX", followed by 15
+bytes of data, followed by two bytes for the checksum<br>
+<br>
+Each
+network layer message carried inside the datalink layer message will
+be of fixed size (15 bytes). <br>
+<br>
+The checksum will be a two
+byte integer (in ASCII, hence two bytes, NOT in binary), i.e. from 00
+to 99. This number will be the sum of the 15 bytes of the data,
+modulo 100 of course.<br>
+<br>
+If a message is corrupted, (checksum
+is incorrect), then the datalink layer scans for the next XX
+(hopefully is at the next two bytes, but it may not if some bytes
+were accidentally deleted), and attemps to find the correct location
+for the beginning of the next message. <b>Note that the data itself
+could contain the XX value,</b> and hence, the next XX value you see
+may or may not be the beginning of the next message. If XX occurs 19
+bytes and the checksums appear ok then you can assume that you have
+"resync'ed", i.e., you have found the right place in the
+byte stream where each message begins.</p>
+<p>
+The
+datalink layer has two subroutines (the subroutines don't have to
+have exactly the same parameters, you can add more or change them if
+you want, they are just a guideline)</p>
+<ol type="a">
+	<li>
+<p> datalink_receive_from_network(char
+	*&nbsp;msg, char&nbsp;next_hop)&nbsp;&nbsp;<br>
+This function will
+	be&nbsp;<b>called
+	by the network layer&nbsp;</b> to
+	give a network layer message to the&nbsp;datalink&nbsp;layer. The
+	network layer message is pointed to by char *msg,&nbsp;and the
+	length of the message is fixed (as described above).
+	The&nbsp;&nbsp;next_hop&nbsp;&nbsp;is&nbsp;the id of the neighboring
+	node that should receive this message.&nbsp;This routine will output
+	to the output channel (text file) the message given by the network
+	layer, as described above.</p>
+	</li><li>
+<p>datalink_receive_from_channel()<br>
+This
+	function&nbsp;<b>reads
+	from each of the input files&nbsp;</b>(i.e.
+	the channels from each neighbor) until it reaches an end of file in
+	each of these files. Whenever it has a complete message it gives it
+	to the network layer by calling&nbsp;network_receive_from_datalink()
+	(see network layer below). Again, the fact that it reached an
+	end-of-file&nbsp;<u><b>does
+	not</b></u> mean
+	that there are no more bytes, since these bytes may not have arrived
+	yet. Thus, you have to read until you get end-of-file, and then you
+	have to put your program to "sleep" for 1 second. When it
+	wakes up you should try to read more. If there is nothing to read
+	you go to sleep for one second more, etc..&nbsp;(See Program
+	Skeleton below) Also, note that the fact that one file has no more
+	data does not mean that there is no more data from other files.
+	Thus, once you reach an end-of-file on ALL input files, then you go
+	to sleep for a second 
+	</p>
+</li></ol>
+<br>
+
+<p></p>
+<h3> Network Layer</h3>
+<p>
+The
+network layer will handle two types of messages, "data"
+messages and "routing" messages. Data messages are used to
+carry transport layer messages. Routing messages are used to find the
+routing path to each destination (to each of the other 9 nodes).
+<br>
+<br>
+Data messages consist of the letter "D"
+followed by 1 byte for the destination, two bytes that count the
+number of data bytes in the data message, followed by the data
+itself, which are the contents of the transport layer message being
+carried by the network layer. <br>
+<br>
+Note that the transport
+layer message may not be big enough to make the whole data message 15
+bytes long. Hence, we need to pad it before giving the message to the
+datalink layer. You can pad the message with spaces (blanks, "
+"). <br>
+<br>
+For the routing protocol, we will implement a
+link-state routing approach. Each node, every 10 seconds, will
+generate a link-state packet (LSP), and give a copy of it (via the
+datalink layer of course) to each of its neighbors.<br>
+<br>
+The
+LSP has the following format.</p>
+<ul>
+	<li>
+<p style="margin-bottom: 0in">The
+	letter "L" (for link-state packet). This distinguishes it
+	from a data packet, which begins with D. 
+	</p>
+	</li><li>
+<p style="margin-bottom: 0in">The
+	Id of the node (one byte, "0" through "9"). 
+	</p>
+	</li><li>
+<p style="margin-bottom: 0in">A
+	two digit sequence number (or timestamp), "00" through
+	"99" 
+	</p>
+	</li><li>
+<p style="margin-bottom: 0in">A
+	list of its "live" neighbors 
+	</p>
+	</li><li>
+<p>
+Padding as necessary (spaces).</p>
+</li></ul>
+<p>
+Every
+10 seconds, when the node generates a new LSP, it increases its
+sequence number. Hence, the first LSP has a seq # of 00, the next one
+generated 10 seconds later is 01, etc<br>
+<br>
+All neighbors are
+assumed to be live at the beginning of the program. If a neighbor has
+not sent a message to this node (of any type, data or link-state
+packet) for 30 seconds, then we declare the neighbor dead and remove
+it from our live list.<br>
+<br>
+The neighbor can be added to the
+live list again if the node receives again a message from the
+neighbor.<br>
+<br>
+As in a typical routing protocol, the node
+should construct a topology graph, and find the shortest path
+(minimum hops) to all other nodes.<br>
+<br>
+<b>To make routing
+consistent in the project, if two neighbors are the same # hops to a
+destination, choose as next hop the one with the lowest id.<br>
+<br>
+Note
+also that even if your routing protocol is not working properly, you
+should always be able to send data messages to your neighbors, since
+you know them in advance from the arguments of the program.</b></p>
+<p>
+The
+network layer has three subroutines</p>
+<ol type="a">
+	<li>
+<p>
+	network_receive_from_transport(char
+	* msg, int len, int dest). This function is called by the transport
+	layer. It asks the network layer to send the byte &nbsp;sequence msg
+	of length len bytes as a message to destination dest.
+	</p></li><li>
+<p>
+	network_receive_from_datalink(char
+	* msg, int neighbor_id) this function is called by the data link
+	layer, indicating that a message msg was received from the channel
+	from neighbor neighbor_id.&nbsp; If the message is addressed to this
+	node, then the network layer gives the message to the transport
+	layer by calling transport_receive_from_network() (see transport
+	layer routines below)
+	</p></li><li>
+<p>
+	network_route()
+	- this is called by the main program (see below), and it checks if
+	10 seconds have elapsed from the last time the node send its routing
+	messages. If so, it sends a new LSP out to each of its neighbors. 
+	</p>
+</li></ol>
+<p><br>
+<br>
+
+</p>
+<h3>Transport Layer</h3>
+<p>
+Each
+transport layer message will be limited in size, and hence, if the
+string given as argument to the program is bigger than this, then the
+string will have to <b>be split into multiple transport layer messages</b>
+</p>
+<p>
+The
+transport layer will implement a negative acknowledgement protocol.
+(No we did not cover it in class, but it is a simple one).
+</p><p>
+Data
+messages have the following format</p>
+<ol type="a">
+	<li>
+<p>
+1
+	byte for message type: "D" for data</p>
+	</li><li>
+<p>
+1
+	byte source id (from "0" up to "9")</p>
+	</li><li>
+<p>
+1
+	byte destination id (from "0" up to "9") 
+	</p>
+	</li><li>
+<p>
+2
+	byte sequence number (from "00" to "99")</p>
+	</li><li>
+<p>
+up
+	to five bytes of data (i.e. up to five bytes of the string to be
+	transported) 
+	</p>
+</li></ol>
+<p>
+Negative
+acks&nbsp; messages have the following format</p>
+<ol type="a">
+	<li>
+<p>
+1
+	byte message type: "N" for nack</p>
+	</li><li>
+<p>
+1
+	byte source id (from "0" up to "9") (the
+	receiver) 
+	</p>
+	</li><li>
+<p>
+1
+	byte destination id (from "0" up to "9") (the
+	sender) 
+	</p>
+	</li><li>
+<p>
+2
+	byte sequence number (it contains the sequence number of the&nbsp;
+	message that was not received). 
+	</p>
+</li></ol>
+<p><b>Source
+Behavior:</b></p>
+<p>The
+source of the data will try to trasfer the "string" that
+was given as argument to the program to the destination which was
+also given as argument to the program</p>
+<p>The
+string will likely be more than five bytes, so break it up into
+five-byte pieces, each becomes a data message and has a sequence
+number.</p>
+<p>ALL
+of these data messages are sent to the destination (via the network
+layer).</p>
+<p>If
+the source receives a nack for a particular data message, it
+retransmits this particular message.</p>
+<p>If
+the source receives a nack with sequence number larger than the
+largest sequence number of the data (call this the "final"
+nack), then it is done, it assumes all data was received.</p>
+<p>If
+the source does not receive a nack for a period of 20 seconds, and we
+have not received the final nack, it resends all of the data messages
+again. 
+</p>
+<p><b>Destination
+Behavior</b></p>
+<p>The
+destination does not know who it will receive data messages from
+until the messages begin to arrive.</p>
+<p>Data
+messages will have sequence numbers 00, 01, 02, 03, etc. 
+</p>
+<p>Assume
+you receive data message with seq # i at time t. If by time t+5 (5
+more seconds) you have not received all data messages in the range 0
+to i, then you send a nack for every data message that your are
+missing in this range.</p>
+<p>Also,
+assume you receive data message with seq# i at time t. If by time t+5
+you have not received data message with seq# i+1, then you send a
+nack i+1 back to the source. 
+</p>
+<p>The
+transport protocol has two subroutines:&nbsp;</p>
+<ol type="a">
+	<li>
+<p>
+	transport_send().&nbsp;<br>
+This
+	routine is called once per second by the main program. If enough
+	time has ellapsed (see arguments of program), the transport layer
+	sends the data to the destination. Also, if this node is a receiver
+	(it has received data) then it also sends nacks as appropriate. 
+	</p>
+	</li><li>
+<p>
+	transport_receive_from_network(char
+	*msg,&nbsp;int&nbsp;len,&nbsp;int&nbsp;source)&nbsp;<br>
+Receives a
+	transport-layer message from the network layer. This function is
+	called by the network layer when it has a message ready for the
+	transport layer. The transport layer message is pointed to by&nbsp;msg,
+	and the&nbsp;messge&nbsp;length is&nbsp;len. The argument source
+	indicates the original source of this message (i.e. the source field
+	in the network layer message). .</p>
+	</li><li>
+<p>
+	transport_output_all_received()<br>
+This
+	function is called only once at the end of the program. It
+	will&nbsp;<b>reassemble&nbsp;</b>the string that it received from
+	each source,&nbsp;then&nbsp;output the string into
+	thenodeXreceived&nbsp;file, where X is the id of the node (as
+	described&nbsp;ealier). 
+	</p>
+</li></ol>
+<h2>Program Skeleton</h2>
+<p>The
+subroutines given don't have to have exactly the same parameters, you
+can add more or change them if you want, they are just a guideline.
+You can also declare any global variables that you one. 
+</p>
+<p>The main program simply consists of two subroutine calls:</p>
+<ol>
+	<li>
+<p style="margin-bottom: 0in">A call to&nbsp; the transport
+	layer to send messages</p>
+	</li><li>
+<p>A call to the data-link layer to receive messages from the
+	input channels</p>
+</li></ol>
+<p>It should look something like this (well, in general, and depends
+on the language you choose, of course)</p>
+<p>main(argc, argv) {</p>
+<p>&nbsp;&nbsp;Intialization steps (opening files, etc)</p>
+<p>&nbsp;&nbsp;let life = # seconds of life of the process according to the
+arguments</p>
+<p>&nbsp;&nbsp;for (i=0; i &lt; life; i++) {</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;datalink_receive_from_channel();</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;transport_send();</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;sleep(1);</p>
+<p>&nbsp;&nbsp;}<br>
+<br>
+&nbsp;&nbsp;transport_output_all_received()</p>
+<p>}</p>
+<p>Again, the above should be the behavior of your program. How you
+actually implement it is up to you. The skeleton is just a
+suggestion.</p>
+<p><b>DO NOT RUN YOUR PROGRAM WITHOUT THE SLEEP COMMAND.</b>
+Otherwise you would use too much CPU time and administrators are
+going to get upset with you and with me!</p>
+<p><u><b>Notice that your process will finish within "life"
+seconds (or about) after you started it.</b></u></p>
+<p>Note that you have to run multiple processes in the background.
+The minimum are two processes that are neighbors of each other, of
+course.<br>
+<br>
+After each "run", you will have to
+delete the output files by hand (otherwise their contents would be
+used in the next run, which of course is incorrect).<br>
+<br>
+Also,
+after each run, <b>you should always check that you did not leave any
+unwanted processes running, especially after you log out !!!</b> To
+find out which processes you have running, type 
+</p>
+<p>ps -ef | grep userid</p>
+<p>where userid is your Unix login id. (mine is jcobb). That will
+give you a list of processes with the process identifier (the process
+id is the large number after your user id in the listing)</p>
+<p>To kill a process type the following</p>
+<p>kill -9 processid</p>
+<p>I will give you soon a little writeup on Unix (how to compile,
+etc) and account information. However, you should have enough info by
+now to start working on the design of the code</p>
+<h3 class="western">How to run your program</h3>
+<p>You will notice that to run a scenario in your network, there is a
+lot of typing! For example, the small scenario above:</p>
+<p>&gt; node 0&nbsp;100 2 "this is a message from 0"&nbsp;
+30 1 &amp;</p>
+<p>&gt; node 1&nbsp;100&nbsp; 2&nbsp; "this is a message from
+1"&nbsp; 30 0 2 &amp;</p>
+<p>&gt; node 2 &nbsp;100&nbsp; 2 1 &amp;</p>
+<p>requires you to type a lot! It is worse of course if we have 10
+nodes.</p>
+<p>What we want is to start all nodes at the same time (or very close
+to the same time). So, we use the shell program to do this for us. To
+run a scenario, create a file, e.g., scenario.sh, and add the
+following to it with a text editor</p>
+<p>&nbsp;node 0&nbsp;100 2 "this is a message from 0"&nbsp;
+30 1 &amp;</p>
+<p>&nbsp;node 1&nbsp;100&nbsp; 2&nbsp; "this is a message from
+1"&nbsp; 30 0 2 &amp;</p>
+<p>&nbsp;node 2 &nbsp;100&nbsp; 2 1 &amp;</p>
+<p>Then, execute the following at the unix prompt</p>
+<p>&gt;&nbsp; sh scenario.sh</p>
+<p>This should put all three processes in the background. You can
+double check this by doing the command "jobs"</p>
+<p>&gt; jobs</p>
+<p>You should see that all of the three nodes are running in the
+background.<br>
+<br>
+That's it.&nbsp; 
+</p>
+<p>Good luck !!!</p>
+
+
+</body></html>

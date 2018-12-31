@@ -1,0 +1,74 @@
+We will use scenarios similar (but not identical) to the ones below.
+
+Grading:
+
+0 - 35 pts depending on effort, if nothing works :) Note that this is a subjective measure, so don't argue with the TA about it.
+
+Otherwise, 35 + how many points you get by *successfully* running each of the following scenarios
+
+Scenario 1 (35 pts)
+===================
+
+% Two nodes connected by a link
+%       0 --- 1
+
+foo 0 120 1 "The Ximplest thing in the world is XXX" 30 1 &
+foo 1 120 1 0 &
+
+Since nodes are neighbors they should be able to talk to each other even if your routing protocol is not working correctly or at all. I.e., you should always be able to send/receives messages to/from your neighbor.
+
+a) 10 points: messages encoded correctly using character insertion
+
+b) 15 points: if the string is passed correctly to node 1 (transport layer works)
+
+c) 10 points: We will keep the output of the first run (keep contents of channel from 0 to 1, empty contents of channel 1 to 0) and run node 1 without node 0, except that some messages will be corrupted (and thus should fail the checksum) and perhaps delete some transport layer messages. Node 1 should detect the corrupted messages, throw them away, the datalink layer should recover and continue to receive messages, and nacks should be sent for the lost messages.
+
+
+
+Scenario 2 (20 pts)
+===================
+
+% Three nodes connected as a cycle 
+%          0      3------6
+%         /  \   / \     |
+%        /    \ /   \    |
+%       1 ---  2 -- 4 -- 5
+% Please check my configuration below is ok (neighbors are not missing, etc)
+
+foo 0 120 5 "Message Sent Over" 30 1 2 &
+foo 1 120 1 0 2 &
+foo 2 120 2 0 1 3 4 &
+foo 3 120 3 2 4 6 &
+foo 4 120 4 2 3 5 &
+foo 5 120 5 4 6 &
+foo 6 120 6 3 5 &
+
+a) 10 points: I am interested in seeing that the link state packets are sent throughout the network. I am also interested to see that the transport layer messages are routed along the shortest path from 0 to 5. 
+
+b) 10 points: I will start the transport layer after 100 seconds, and increase the lifetime of all nodes to 180 seconds. After about 30 seconds, I will kill a node (e.g. 4). The routing should adapt to the new path, and the transport layer messages should arrive correctly to node 5 along the new path. 
+
+
+
+Scenario 3 (10 pts)
+=====================
+
+Check if the receiver receives from multiple senders. (three senders, same receiver)
+
+** Check that all strings are received **
+
+%           4
+%           |
+%           |
+%           0
+%         / | \ 
+%        /  |  \
+%       /   |   \  
+%      1    2    3
+
+foo 0 120 0 1 2 3 4 &
+foo 4 120 4 0 &
+foo 1 120 4 "StringFrom1" 30 0 &
+foo 2 120 4 "StringFrom2" 30 0 &
+foo 3 120 4 "StringFrom3" 30 0 &
+
+
